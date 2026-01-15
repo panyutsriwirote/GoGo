@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-const boardSize = 9
+const BoardSize = 9
 const boardDisplayTemplate = `
     A   B   C   D   E   F   G   H   I
   +---+---+---+---+---+---+---+---+---+
@@ -69,7 +69,7 @@ type BoardState struct {
 	NextPlayer rune
 	XPrisoner  int
 	OPrisoner  int
-	Stones     [boardSize][boardSize]rune
+	Stones     [BoardSize][BoardSize]rune
 }
 
 func InitBoardState() *BoardState {
@@ -79,7 +79,7 @@ func InitBoardState() *BoardState {
 		NextPlayer: 'X',
 		XPrisoner:  0,
 		OPrisoner:  0,
-		Stones: [boardSize][boardSize]rune{
+		Stones: [BoardSize][BoardSize]rune{
 			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
 			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
 			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
