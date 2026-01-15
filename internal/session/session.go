@@ -64,7 +64,11 @@ func (session *GameSession) PlayTurn() *GameEndSignal {
 		var stone_err *board.StonePlacingError
 		session.Board, stone_err = session.Board.PlaceStone(move)
 		if stone_err == nil {
-			rule.ResolveBoard(session.Board)
+			resolution_error := rule.ResolveBoard(session.Board)
+			if resolution_error != nil {
+				fmt.Printf("Invalid move: %v\n", resolution_error.Reason)
+				session.Board = session.Board.Prev
+			}
 		} else {
 			fmt.Printf("%v. Please try again.\n", stone_err.Reason)
 		}
