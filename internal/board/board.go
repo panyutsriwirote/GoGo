@@ -32,35 +32,45 @@ const boardDisplayTemplate = `
 `
 
 type InvalidCoordError struct {
-	coord string
+	coord_string string
 }
 
 func (err *InvalidCoordError) Error() string {
-	return fmt.Sprintf("Invalid coordinate: %v", err.coord)
+	return fmt.Sprintf("Invalid coordinate: %v", err.coord_string)
 }
 
-func coordTo2DIndex(coord string) (int, int, *InvalidCoordError) {
-	if len(coord) != 2 {
-		return -1, -1, &InvalidCoordError{coord}
+type Coord struct {
+	X   int
+	Y   int
+	Str string
+}
+
+func (coord *Coord) String() string {
+	return coord.Str
+}
+
+func stringToCoord(coord_string string) (*Coord, *InvalidCoordError) {
+	if len(coord_string) != 2 {
+		return nil, &InvalidCoordError{coord_string}
 	}
 
-	coord = strings.ToUpper(coord)
+	coord_string = strings.ToUpper(coord_string)
 
 	var x, y int
 
-	if first_component := coord[0]; 'A' <= first_component && first_component <= 'I' {
+	if first_component := coord_string[0]; 'A' <= first_component && first_component <= 'I' {
 		y = int(first_component) - 'A'
 	} else {
-		return -1, -1, &InvalidCoordError{coord}
+		return nil, &InvalidCoordError{coord_string}
 	}
 
-	if second_component := coord[1]; '1' <= second_component && second_component <= '9' {
+	if second_component := coord_string[1]; '1' <= second_component && second_component <= '9' {
 		x = '9' - int(second_component)
 	} else {
-		return -1, -1, &InvalidCoordError{coord}
+		return nil, &InvalidCoordError{coord_string}
 	}
 
-	return x, y, nil
+	return &Coord{x, y, coord_string}, nil
 }
 
 type BoardState struct {
@@ -95,32 +105,32 @@ func InitBoardState() *BoardState {
 
 type StonePlacingError struct {
 	Reason string
-	coord  string
+	coord  *Coord
 }
 
 func (err *StonePlacingError) Error() string {
 	return fmt.Sprintf("Cannot place stone at %v: %v", err.coord, err.Reason)
 }
 
-func (board_state *BoardState) PlaceStone(coord string) (*BoardState, *StonePlacingError) {
-	x, y, err := coordTo2DIndex(coord)
+func (board_state *BoardState) PlaceStone(coord_string string) (*BoardState, *StonePlacingError) {
+	coord, err := stringToCoord(coord_string)
 	if err != nil {
 		return board_state, &StonePlacingError{
 			Reason: "Invalid coordinate",
 			coord:  coord,
 		}
 	}
-	if board_state.Stones[x][y] != ' ' {
+	if board_state.Stones[coord.X][coord.Y] != ' ' {
 		return board_state, &StonePlacingError{
 			Reason: "Space already taken",
 			coord:  coord,
 		}
 	}
 	new_stones := board_state.Stones
-	new_stones[x][y] = board_state.NextPlayer
+	new_stones[coord.X][coord.Y] = board_state.NextPlayer
 	new_state := BoardState{
 		Prev:       board_state,
-		LastMove:   coord,
+		LastMove:   coord.Str,
 		NextPlayer: switchPlayer(board_state.NextPlayer),
 		XPrisoner:  board_state.XPrisoner,
 		OPrisoner:  board_state.OPrisoner,
