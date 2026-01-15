@@ -1,6 +1,9 @@
 package board
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 const boardSize = 9
 const boardDisplayTemplate = `
@@ -24,6 +27,8 @@ const boardDisplayTemplate = `
   +---+---+---+---+---+---+---+---+---+
 1 | %c | %c | %c | %c | %c | %c | %c | %c | %c |
   +---+---+---+---+---+---+---+---+---+
+             X's prisoner: %v
+             O's prisoner: %v
 `
 
 type InvalidCoordError struct {
@@ -38,6 +43,8 @@ func coordTo2DIndex(coord string) (int, int, *InvalidCoordError) {
 	if len(coord) != 2 {
 		return -1, -1, &InvalidCoordError{coord}
 	}
+
+	coord = strings.ToUpper(coord)
 
 	var x, y int
 
@@ -57,15 +64,21 @@ func coordTo2DIndex(coord string) (int, int, *InvalidCoordError) {
 }
 
 type BoardState struct {
-	Prev        *BoardState
-	next_player rune
-	stones      [boardSize][boardSize]rune
+	Prev       *BoardState
+	LastMove   string
+	NextPlayer rune
+	XPrisoner  int
+	OPrisoner  int
+	stones     [boardSize][boardSize]rune
 }
 
 func InitBoardState() *BoardState {
 	return &BoardState{
-		Prev:        nil,
-		next_player: 'X',
+		Prev:       nil,
+		LastMove:   "",
+		NextPlayer: 'X',
+		XPrisoner:  0,
+		OPrisoner:  0,
 		stones: [boardSize][boardSize]rune{
 			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
 			{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
@@ -104,19 +117,35 @@ func (board_state *BoardState) PlaceStone(coord string) (*BoardState, *StonePlac
 		}
 	}
 	new_stones := board_state.stones
-	new_stones[x][y] = board_state.next_player
-	var new_next_player rune
-	if board_state.next_player == 'X' {
-		new_next_player = 'O'
-	} else {
-		new_next_player = 'X'
-	}
+	new_stones[x][y] = board_state.NextPlayer
 	new_state := BoardState{
-		Prev:        board_state,
-		next_player: new_next_player,
-		stones:      new_stones,
+		Prev:       board_state,
+		LastMove:   coord,
+		NextPlayer: switchPlayer(board_state.NextPlayer),
+		XPrisoner:  board_state.XPrisoner,
+		OPrisoner:  board_state.OPrisoner,
+		stones:     new_stones,
 	}
 	return &new_state, nil
+}
+
+func (board_state *BoardState) Pass() *BoardState {
+	return &BoardState{
+		Prev:       board_state,
+		LastMove:   "P",
+		NextPlayer: switchPlayer(board_state.NextPlayer),
+		XPrisoner:  board_state.XPrisoner,
+		OPrisoner:  board_state.OPrisoner,
+		stones:     board_state.stones,
+	}
+}
+
+func switchPlayer(player rune) rune {
+	if player == 'X' {
+		return 'O'
+	} else {
+		return 'X'
+	}
 }
 
 func (board_state *BoardState) Display() {
@@ -203,5 +232,7 @@ func (board_state *BoardState) Display() {
 		board_state.stones[8][6],
 		board_state.stones[8][7],
 		board_state.stones[8][8],
+		board_state.XPrisoner,
+		board_state.OPrisoner,
 	)
 }
