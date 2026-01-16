@@ -195,3 +195,74 @@ func (board_state *BoardState) Display() {
 		board_state.OPrisoner,
 	)
 }
+
+type Group []*coord.Coord
+
+func (board_state *BoardState) GetLiberty(pos *coord.Coord) int {
+	if pos == nil {
+		return 0
+	}
+	liberty := 0
+	if north := pos.North(); north != nil && board_state.GetOwner(north) == ' ' {
+		liberty += 1
+	}
+	if south := pos.South(); south != nil && board_state.GetOwner(south) == ' ' {
+		liberty += 1
+	}
+	if east := pos.East(); east != nil && board_state.GetOwner(east) == ' ' {
+		liberty += 1
+	}
+	if west := pos.West(); west != nil && board_state.GetOwner(west) == ' ' {
+		liberty += 1
+	}
+	return liberty
+}
+
+func (board_state *BoardState) GetGroupLiberty(group Group) int {
+	liberty := 0
+	for _, pos := range group {
+		liberty += board_state.GetLiberty(pos)
+	}
+	return liberty
+}
+
+func (board_state *BoardState) RemoveGroup(group Group) int {
+	num_removed := 0
+	for _, v := range group {
+		if v == nil {
+			continue
+		}
+		board_state.Stones[v.X][v.Y] = ' '
+		num_removed += 1
+	}
+	return num_removed
+}
+
+func (board_state *BoardState) GetGroup(pos *coord.Coord) Group {
+	owner := board_state.GetOwner(pos)
+	if owner == ' ' {
+		return nil
+	}
+	visited := map[coord.Coord]bool{*pos: true}
+	board_state.getConnectedStones(owner, pos.North(), visited)
+	board_state.getConnectedStones(owner, pos.South(), visited)
+	board_state.getConnectedStones(owner, pos.East(), visited)
+	board_state.getConnectedStones(owner, pos.West(), visited)
+	// Convert into slice.
+	var stones Group
+	for k := range visited {
+		stones = append(stones, &k)
+	}
+	return stones
+}
+
+func (board_state *BoardState) getConnectedStones(owner rune, pos *coord.Coord, visited map[coord.Coord]bool) {
+	if pos == nil || visited[*pos] || board_state.GetOwner(pos) != owner {
+		return
+	}
+	visited[*pos] = true
+	board_state.getConnectedStones(owner, pos.North(), visited)
+	board_state.getConnectedStones(owner, pos.South(), visited)
+	board_state.getConnectedStones(owner, pos.East(), visited)
+	board_state.getConnectedStones(owner, pos.West(), visited)
+}
