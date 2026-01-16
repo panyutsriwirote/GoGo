@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	game_session := session.NewGameSession()
+	game_session := session.New()
 	game_session.Board.Display()
 	for {
 		end_signal := game_session.PlayTurn()

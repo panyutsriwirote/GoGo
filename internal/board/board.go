@@ -16,7 +16,7 @@ type BoardState struct {
 	Stones     [constants.BOARD_SIZE][constants.BOARD_SIZE]rune
 }
 
-func InitBoardState() *BoardState {
+func New() *BoardState {
 	return &BoardState{
 		Prev:       nil,
 		LastMove:   "",
@@ -37,6 +37,13 @@ func InitBoardState() *BoardState {
 	}
 }
 
+func (board_state *BoardState) GetOwner(pos *coord.Coord) rune {
+	if pos == nil {
+		return ' '
+	}
+	return board_state.Stones[pos.X][pos.Y]
+}
+
 type StonePlacingError struct {
 	Reason       string
 	coord_string string
@@ -54,7 +61,7 @@ func (board_state *BoardState) PlaceStone(coord_string string) (*BoardState, *St
 			coord_string: coord_string,
 		}
 	}
-	if board_state.Stones[coord.X][coord.Y] != ' ' {
+	if board_state.GetOwner(coord) != ' ' {
 		return board_state, &StonePlacingError{
 			Reason:       "Space already taken",
 			coord_string: coord_string,
@@ -65,7 +72,7 @@ func (board_state *BoardState) PlaceStone(coord_string string) (*BoardState, *St
 	new_state := BoardState{
 		Prev:       board_state,
 		LastMove:   fmt.Sprintf("%v", coord),
-		NextPlayer: switchPlayer(board_state.NextPlayer),
+		NextPlayer: SwitchPlayer(board_state.NextPlayer),
 		XPrisoner:  board_state.XPrisoner,
 		OPrisoner:  board_state.OPrisoner,
 		Stones:     new_stones,
@@ -73,18 +80,26 @@ func (board_state *BoardState) PlaceStone(coord_string string) (*BoardState, *St
 	return &new_state, nil
 }
 
+func (board_state *BoardState) AddPrisoner(player rune, amount int) {
+	if player == 'X' {
+		board_state.XPrisoner += amount
+	} else {
+		board_state.OPrisoner += amount
+	}
+}
+
 func (board_state *BoardState) Pass() *BoardState {
 	return &BoardState{
 		Prev:       board_state,
 		LastMove:   "P",
-		NextPlayer: switchPlayer(board_state.NextPlayer),
+		NextPlayer: SwitchPlayer(board_state.NextPlayer),
 		XPrisoner:  board_state.XPrisoner,
 		OPrisoner:  board_state.OPrisoner,
 		Stones:     board_state.Stones,
 	}
 }
 
-func switchPlayer(player rune) rune {
+func SwitchPlayer(player rune) rune {
 	if player == 'X' {
 		return 'O'
 	} else {

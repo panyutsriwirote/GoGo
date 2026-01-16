@@ -14,9 +14,9 @@ type GameSession struct {
 	Board *board.BoardState
 }
 
-func NewGameSession() *GameSession {
+func New() *GameSession {
 	return &GameSession{
-		Board: board.InitBoardState(),
+		Board: board.New(),
 	}
 }
 
