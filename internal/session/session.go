@@ -70,7 +70,7 @@ func (session *GameSession) PlayTurn() *GameEndSignal {
 				session.Board = session.Board.Prev
 			}
 		} else {
-			fmt.Printf("%v. Please try again.\n", stone_err.Reason)
+			fmt.Println(stone_err)
 		}
 	}
 	return nil
