@@ -1,7 +1,9 @@
 package session
 
 import (
+	"bufio"
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/panyutsriwirote/GoGo/internal/board"
@@ -34,9 +36,8 @@ func (end_signal *GameEndSignal) String() string {
 
 func (session *GameSession) PlayTurn() *GameEndSignal {
 	fmt.Printf("%c's move: ", session.Board.NextPlayer)
-	var move string
-	var read_err error
-	_, read_err = fmt.Scanln(&move)
+
+	move, read_err := bufio.NewReader(os.Stdin).ReadString('\n')
 	if read_err != nil {
 		fmt.Print("\n")
 		return &GameEndSignal{
@@ -45,7 +46,10 @@ func (session *GameSession) PlayTurn() *GameEndSignal {
 		}
 	}
 
-	switch move = strings.ToUpper(move); move {
+	move = strings.TrimSpace(move)
+	move = strings.ToUpper(move)
+
+	switch move {
 	case "U":
 		if session.Board.Prev == nil {
 			fmt.Println("Cannot undo further!")
