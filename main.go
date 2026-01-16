@@ -21,8 +21,8 @@ func main() {
 		}
 		game_session.Board.Display()
 	}
-	x_score, o_score := game_session.CountScores()
+	score := game_session.CountScores()
 	fmt.Println("Scores:")
-	fmt.Printf("\tX: %v\n", x_score)
-	fmt.Printf("\tO: %v\n", o_score)
+	fmt.Printf("\tX: %v\n", score.X)
+	fmt.Printf("\tO: %v\n", score.O)
 }

@@ -80,6 +80,6 @@ func (session *GameSession) PlayTurn() *GameEndSignal {
 	return nil
 }
 
-func (session *GameSession) CountScores() (int, int) {
-	return session.Board.XPrisoner, session.Board.OPrisoner
+func (session *GameSession) CountScores() rule.GameScore {
+	return rule.CountScores(session.Board)
 }

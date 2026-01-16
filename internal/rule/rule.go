@@ -43,9 +43,21 @@ func ResolveBoard(board_state *board.BoardState) *ResolutionError {
 	}
 
 	// Check Ko.
-	if board_state.Stones == board_state.Prev.Stones {
+	if board_state.Prev.Prev != nil &&
+		board_state.Stones == board_state.Prev.Prev.Stones {
 		return &ResolutionError{"KO"}
 	}
 
 	return nil
+}
+
+type GameScore struct {
+	X, O int
+}
+
+func CountScores(board_state *board.BoardState) GameScore {
+	return GameScore{
+		X: board_state.XPrisoner,
+		O: board_state.OPrisoner,
+	}
 }
