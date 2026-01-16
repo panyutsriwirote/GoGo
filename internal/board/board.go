@@ -109,7 +109,7 @@ func SwitchPlayer(player rune) rune {
 
 func (board_state *BoardState) Display() {
 	fmt.Printf(
-		constants.BOARD_DISPLAT_TEMPLATE,
+		constants.BOARD_DISPLAY_TEMPLATE,
 		board_state.Stones[0][0],
 		board_state.Stones[0][1],
 		board_state.Stones[0][2],

@@ -1,7 +1,7 @@
 package constants
 
 const BOARD_SIZE = 9
-const BOARD_DISPLAT_TEMPLATE = `
+const BOARD_DISPLAY_TEMPLATE = `
     A   B   C   D   E   F   G   H   I
   +---+---+---+---+---+---+---+---+---+
 9 | %c | %c | %c | %c | %c | %c | %c | %c | %c |
