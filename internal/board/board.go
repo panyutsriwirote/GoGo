@@ -38,26 +38,26 @@ func InitBoardState() *BoardState {
 }
 
 type StonePlacingError struct {
-	Reason string
-	coord  *coord.Coord
+	Reason       string
+	coord_string string
 }
 
 func (err *StonePlacingError) Error() string {
-	return fmt.Sprintf("Cannot place stone at %v: %v", err.coord, err.Reason)
+	return fmt.Sprintf("Cannot place stone at %v: %v", err.coord_string, err.Reason)
 }
 
 func (board_state *BoardState) PlaceStone(coord_string string) (*BoardState, *StonePlacingError) {
 	coord := coord.FromString(coord_string)
 	if coord == nil {
 		return board_state, &StonePlacingError{
-			Reason: "Invalid coordinate",
-			coord:  coord,
+			Reason:       "Invalid coordinate",
+			coord_string: coord_string,
 		}
 	}
 	if board_state.Stones[coord.X][coord.Y] != ' ' {
 		return board_state, &StonePlacingError{
-			Reason: "Space already taken",
-			coord:  coord,
+			Reason:       "Space already taken",
+			coord_string: coord_string,
 		}
 	}
 	new_stones := board_state.Stones
