@@ -11,6 +11,8 @@ type Coord struct {
 	X, Y int
 }
 
+var alreadyCreated [constants.BOARD_SIZE][constants.BOARD_SIZE]*Coord
+
 func New(x, y int) *Coord {
 	if x < 0 ||
 		y < 0 ||
@@ -18,7 +20,13 @@ func New(x, y int) *Coord {
 		y >= constants.BOARD_SIZE {
 		return nil
 	}
-	return &Coord{x, y}
+	existing_coord := alreadyCreated[x][y]
+	if existing_coord != nil {
+		return existing_coord
+	}
+	new_coord := &Coord{x, y}
+	alreadyCreated[x][y] = new_coord
+	return new_coord
 }
 
 func (c *Coord) String() string {

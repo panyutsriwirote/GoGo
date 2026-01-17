@@ -243,7 +243,7 @@ func (board_state *BoardState) GetGroup(pos *coord.Coord) Group {
 	if owner == ' ' {
 		return nil
 	}
-	visited := map[coord.Coord]bool{*pos: true}
+	visited := map[*coord.Coord]bool{pos: true}
 	board_state.getConnectedStones(owner, pos.North(), visited)
 	board_state.getConnectedStones(owner, pos.South(), visited)
 	board_state.getConnectedStones(owner, pos.East(), visited)
@@ -251,16 +251,16 @@ func (board_state *BoardState) GetGroup(pos *coord.Coord) Group {
 	// Convert into slice.
 	var stones Group
 	for k := range visited {
-		stones = append(stones, &k)
+		stones = append(stones, k)
 	}
 	return stones
 }
 
-func (board_state *BoardState) getConnectedStones(owner rune, pos *coord.Coord, visited map[coord.Coord]bool) {
-	if pos == nil || visited[*pos] || board_state.GetOwner(pos) != owner {
+func (board_state *BoardState) getConnectedStones(owner rune, pos *coord.Coord, visited map[*coord.Coord]bool) {
+	if pos == nil || visited[pos] || board_state.GetOwner(pos) != owner {
 		return
 	}
-	visited[*pos] = true
+	visited[pos] = true
 	board_state.getConnectedStones(owner, pos.North(), visited)
 	board_state.getConnectedStones(owner, pos.South(), visited)
 	board_state.getConnectedStones(owner, pos.East(), visited)
